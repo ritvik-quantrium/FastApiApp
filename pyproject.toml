@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "fast-api-page"
+version = "0.1.0"
+description = ""
+authors = ["Stenardt-9002 <esd17i014@iiitdm.ac.in>"]
+readme = "README.md"
+packages = [{include = "fast_api_page"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+uvicorn = "^0.20.0"
+fastapi = "^0.89.1"
+pydantic = "^1.10.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
