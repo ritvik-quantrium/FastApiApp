@@ -1,31 +1,29 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,Path,Query
 from pydantic import BaseModel
 from typing import Optional,List
-app = FastAPI()
-
-users = []
 
 
 
-class User(BaseModel):
-    email:str 
-    isactive : bool 
-    google: Optional[str]
+from api import courses ,users,sections
 
 
 
-@app.get("/users" , response_model=List[User])
-async def get_users():
-    return users
+app = FastAPI(
+    title="Fast API Testing",
+    description="Various API example because yes",
+    version = "0.0.1",
+    contact={
+        "name":"I hate my name",
+        "email":"respect_my_privacy@whocares.gov",
+    },
+    license_info={
+        "name":"Not a lawyer"
+    }
 
+)
 
-@app.post("/users")
-async def create_root(user:User):
-    users.append(user)
-    return "Suckess"
-
-@app.get("/users/{id}")
-async def get_user(id : int):
-    return users[id]
+app.include_router(users.router)
+app.include_router(courses.router)
+app.include_router(sections.router)
 
 
