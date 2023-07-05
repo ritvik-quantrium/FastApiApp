@@ -1,5 +1,6 @@
 
 
+from sqlalchemy import func
 from .. import models,schemas,utils,oauth2
 from fastapi import FastAPI,Response,status,HTTPException,Depends,APIRouter
 from sqlalchemy.orm import Session
@@ -12,19 +13,42 @@ router = APIRouter(
      tags = ["Posts"]
 )
 
-@router.get("/",response_model=List[schemas.Post])
-def get_posts(db: Session = Depends(get_db),current_user = Depends(oauth2.get_current_user)):
+# @router.get("/",response_model=List[schemas.Post])
+@router.get("/",response_model=List[schemas.PostOut])
+def get_posts(db: Session = Depends(get_db),current_user = Depends(oauth2.get_current_user),limit: int =10 ,skip:int = 0,search:Optional[str]=""):
+
     # cursor.execute("""SELECT * FROM post""")
     # post = cursor.fetchall()
-    print(current_user.email)
-    posts = db.query(models.Post).filter().all()
+    # print(models.Post.title.contains(search))
+    # print(db.query(models.Post).filter(models.Post.title.contains(search)))
 
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+
+    # posts = db.query(models.Post).filter().all()
     # posts = db.query(models.Post).filter(models.Post.owner_id==current_user.id).all()
-
+ 
+ 
 
     # posts = db.query(models.Post)
     # print(posts)# will return query
-    return posts
+ 
+ 
+    # results = db.query(models.Post , func.count(models.Votes.post_id).label("votes")).join(models.Votes,models.Votes.post_id == models.Post.id , isouter=True).group_by(models.Post.id).all()
+    results = db.query(models.Post , func.count(models.Votes.post_id).label("votes")).join(models.Votes,models.Votes.post_id == models.Post.id , isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    # print(results[0][1])
+
+
+
+    #this was not covered has to manually figure it out : If you dont write correct schema use this to figure out output
+    # for i in range(len(results)):
+    #     results[i] = {"post":results[i][0] , "votes":results[i][1]}
+
+
+
+
+    return results
+    # return posts
 
 
 
@@ -33,25 +57,31 @@ def get_posts(db: Session = Depends(get_db),current_user = Depends(oauth2.get_cu
 
 
 
-@router.get("/{id}",response_model=schemas.Post)
+# @router.get("/{id}",response_model=schemas.Post)
+@router.get("/{id}",response_model=schemas.PostOut)
+
 def get_posts(id:int,db:Session = Depends(get_db),current_user = Depends(oauth2.get_current_user) ):
-
-
+    #OLD Post retrieval without adding votes in database
+    '''
+    
     post = db.query(models.Post).filter(models.Post.id==id).first() #instead of looking everywhere just return first and stop
-    print(post)
-
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail=f"post with id :{id} was not found")
 
     # if post.owner_id != current_user.id:
     #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Not authorised")
-
     return post
+    '''
 
+    results = db.query(models.Post , func.count(models.Votes.post_id).label("votes")).join(models.Votes,models.Votes.post_id == models.Post.id , isouter=True).group_by(models.Post.id).filter(models.Post.id==id).first()
 
+    if not results:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail=f"post with id :{id} was not found")
+    #we have removed the functionalty that the author of the post can only se the post
+    # if results.Post.owner_id != current_user.id:
+    #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Not authorised")
 
-
-
+    return results
 
     # USING DIRECT POSTGRES CONNECTION
     '''

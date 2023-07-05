@@ -15,15 +15,13 @@ import random
 from sqlalchemy.orm import Session
 from . import models,schemas,utils
 from .database import SessionLocal, engine,get_db
-from .routers import post,user,auth
-
+from .routers import post,user,auth,votes
+from .config import Settings
 
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-
 # #OLD Database connection
 
 # while True:
@@ -48,6 +46,7 @@ async def root():
 app.include_router(post.router)
 app.include_router(user.router)
 app.include_router(auth.router)
+app.include_router(votes.router)
 
 
 

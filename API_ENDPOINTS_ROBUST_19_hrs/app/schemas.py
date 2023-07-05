@@ -5,7 +5,20 @@
 
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr 
+from pydantic import BaseModel, EmailStr, conint 
+
+
+class Userout(BaseModel):
+    id: int
+    email: EmailStr
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+
+
 class PostBase(BaseModel):
     title:str 
     content :str
@@ -20,8 +33,20 @@ class Post(PostBase):
     id:int
     created_at: datetime
     owner_id: int
+    owner: Userout 
     class Config:
         orm_mode = True
+
+
+
+
+#schema for new post after adding votes
+class PostOut(BaseModel):
+    Post: Post 
+    votes: int 
+    class Config:
+        orm_mode = True
+
 
 
 class UserCreate(BaseModel):
@@ -30,14 +55,6 @@ class UserCreate(BaseModel):
 
 
 
-
-class Userout(BaseModel):
-    id: int
-    email: EmailStr
-    created_at: datetime
-
-    class Config:
-        orm_mode = True
 
 
 
@@ -56,3 +73,10 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str]=None
+
+
+
+class Vote(BaseModel):
+    post_id: int 
+    dir: conint(le=1)
+
