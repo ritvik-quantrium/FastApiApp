@@ -77,7 +77,7 @@ def get_posts(id:int,db:Session = Depends(get_db),current_user = Depends(oauth2.
 
     if not results:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail=f"post with id :{id} was not found")
-    #we have removed the functionalty that the author of the post can only se the post
+    #we have removed the functionalty that the author of the post can only see the post
     # if results.Post.owner_id != current_user.id:
     #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Not authorised")
 

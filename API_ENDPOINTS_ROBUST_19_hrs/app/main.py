@@ -2,8 +2,12 @@
 # pip install "psycopg[all]"
 
 # pip install "passlib[bcrypt]"
+# pip install alembic
+# alembic init alembic 
+
 #new main
 from fastapi import FastAPI,Response,status,HTTPException,Depends
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Optional
 from fastapi.params import Body
 from pydantic import BaseModel
@@ -18,10 +22,39 @@ from .database import SessionLocal, engine,get_db
 from .routers import post,user,auth,votes
 from .config import Settings
 
-
-models.Base.metadata.create_all(bind=engine)
+#now in alembic not need to have sqlalchemy run engine to create schema from model
+# models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+
+
+
+origins = [
+    "https://www.google.com"
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:8080",
+]
+dummy = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    # allow_origins=origins,
+    allow_origins=dummy,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
+
+
+
+
+
+
 # #OLD Database connection
 
 # while True:
