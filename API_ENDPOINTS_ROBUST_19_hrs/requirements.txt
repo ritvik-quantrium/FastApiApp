@@ -43,3 +43,4 @@ ujson
 uvicorn
 watchfiles
 websockets
+pydantic-settings

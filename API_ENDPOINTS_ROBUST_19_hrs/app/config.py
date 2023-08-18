@@ -1,7 +1,7 @@
 
 from typing import Optional
-from pydantic import BaseSettings
-
+# from pydantic import BaseSettings
+from pydantic_settings import BaseSetting
 
 class Settings(BaseSettings):
     database_hostname : Optional[str]
