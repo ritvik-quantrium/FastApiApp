@@ -30,6 +30,7 @@ def verify_access_token(token:str,credentials_exception):
         id = payload.get("user_id")
         if id is None:
             raise credentials_exception
+        id = str(id)
         token_data = schemas.TokenData(id = id)
     except JWTError:
         raise credentials_exception
@@ -38,7 +39,7 @@ def verify_access_token(token:str,credentials_exception):
 
 #pass this as an dependecy(get id from token and check whether token is correct)
 def get_current_user(token:str=Depends(oauth2_schema),db:Session = Depends(database.get_db)):
-    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED , detail=f"Could not verify credentails" , headers={"WWW_Authenticate":"Bearer"})
+    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED , detail=f"Could not verify credentials" , headers={"WWW_Authenticate":"Bearer"})
     token = verify_access_token(token=token , credentials_exception=credentials_exception)
     # print("token id")
     # print(token.id)
